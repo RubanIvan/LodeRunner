@@ -37,11 +37,23 @@ public class LevelEditorScript : MonoBehaviour
     public int MouseX;
     public int MouseY;
 
+
+    public GameObject BkgroundPrefab;
+    public GameObject BkgroundImg;
+    public Animator BkgAnim;
+    public bool BkgShow;
+
     void Awake()
     {
         Cursors = Instantiate(CursorsPrefab);
         Cursors.name = "Cusor";
         Cursors.transform.parent = gameObject.transform;
+
+        BkgroundImg = Instantiate(BkgroundPrefab);
+        BkgroundImg.transform.parent= gameObject.transform;
+        BkgroundImg.transform.localPosition=new Vector3(0,-32);
+        BkgroundImg.name = "BkgroundImg";
+        BkgAnim = BkgroundImg.GetComponent<Animator>();
 
     }
 
@@ -53,6 +65,11 @@ public class LevelEditorScript : MonoBehaviour
         CursorsCurrentBlock = Instantiate(GlobalManager.GamePrefab[PrefabEnum.ClearSpace]);
         CursorsCurrentBlock.transform.parent = Cursors.transform;
         CursorsCurrentBlockType = PrefabEnum.ClearSpace;
+
+        //BkgroundImg = GameObject.FindWithTag("BkgImg");
+        //BkgAnim = BkgroundImg.GetComponent<Animator>();
+
+        BkgAnim.Play("LevelsAnimation",0,1.0f); 
 
         
 
@@ -93,6 +110,8 @@ public class LevelEditorScript : MonoBehaviour
             GameObject o = Instantiate(GlobalManager.GamePrefab[CursorsCurrentBlockType], Cursors.transform.position, Quaternion.identity);
             o.transform.parent = GlobalManager.GameMaster.GetComponent<GameMasterScript>().Level.transform;
         }
+
+        BkgroundImg.SetActive(BkgShow);
 
     }
 
@@ -186,5 +205,10 @@ public class LevelEditorScript : MonoBehaviour
     public void ButtonFalseWall()
     {
         SetBlock(PrefabEnum.FalseWall);
+    }
+
+    public void ButtonBkg()
+    {
+        BkgShow = BkgShow ^ true;
     }
 }
