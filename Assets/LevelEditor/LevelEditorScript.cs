@@ -16,7 +16,7 @@ public class LevelEditorScript : MonoBehaviour
         set
         {
             _levelCurent = value;
-            CurrentLevelText.text = "Level: " + value.ToString("D3");
+            CurrentLevelText.text = "Level: " + value.ToString("D2");
         }
     }
     #endregion
@@ -40,36 +40,39 @@ public class LevelEditorScript : MonoBehaviour
 
     public GameObject BkgroundPrefab;
     public GameObject BkgroundImg;
-    public Animator BkgAnim;
     public bool BkgShow;
 
     void Awake()
     {
-        Cursors = Instantiate(CursorsPrefab);
-        Cursors.name = "Cusor";
-        Cursors.transform.parent = gameObject.transform;
+       
 
         BkgroundImg = Instantiate(BkgroundPrefab);
         BkgroundImg.transform.parent= gameObject.transform;
         BkgroundImg.transform.localPosition=new Vector3(0,-32);
         BkgroundImg.name = "BkgroundImg";
-        BkgAnim = BkgroundImg.GetComponent<Animator>();
+        
 
     }
 
 
     void Start()
     {
+        GameObject.Destroy(Cursors);
+        Cursors = Instantiate(CursorsPrefab);
+        Cursors.name = "Cusor";
+        Cursors.transform.parent = gameObject.transform;
+
+        
         GlobalManager = GameObject.Find("GlobalManager").GetComponent<GlobalManagerScript>();
         LevelCurrent = GlobalManager.LevelCurrent;
         CursorsCurrentBlock = Instantiate(GlobalManager.GamePrefab[PrefabEnum.ClearSpace]);
         CursorsCurrentBlock.transform.parent = Cursors.transform;
         CursorsCurrentBlockType = PrefabEnum.ClearSpace;
 
-        //BkgroundImg = GameObject.FindWithTag("BkgImg");
-        //BkgAnim = BkgroundImg.GetComponent<Animator>();
+        BkgroundImg.GetComponent<BkgImgScript>().SetBkgImg(LevelCurrent);
+        
 
-        BkgAnim.Play("LevelsAnimation",0,1.0f); 
+        
 
         
 
@@ -142,7 +145,7 @@ public class LevelEditorScript : MonoBehaviour
         }
         else
         {
-            GlobalManager.LevelCurrent = 149;
+            GlobalManager.LevelCurrent = Const.MaxLevels-1;
         }
 
         LevelChange();
@@ -150,7 +153,7 @@ public class LevelEditorScript : MonoBehaviour
 
     public void ButtonNext()
     {
-        if (GlobalManager.LevelCurrent < 149)
+        if (GlobalManager.LevelCurrent < Const.MaxLevels-1)
         {
             GlobalManager.LevelCurrent++;
         }
