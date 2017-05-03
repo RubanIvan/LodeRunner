@@ -114,7 +114,7 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void StateEnter(Enum prvState)
         {
-            CurAnimator.Play("FailAnimation");
+            CurAnimator.Play("Fall1Animation");
         }
 
         public override void Update()
@@ -129,7 +129,7 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void StateEnter(Enum prvState)
         {
-            CurAnimator.Play("LandingAnimation");
+            CurAnimator.Play("LandingHiAnimation");
         }
 
         public override void Update()

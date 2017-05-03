@@ -15,8 +15,8 @@ public static class Const
     public static Vector3 BlockPivotPoint=new Vector3(-560,450+32);
 
     //Скорость падения
-    public const float Gravity = 70f;
+    public const float Gravity = 90f;
 
-    public const float PlayerSpeed = 90f;
+    public const float PlayerSpeed = 150f;
 
 }

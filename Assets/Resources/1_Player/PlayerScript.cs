@@ -46,7 +46,8 @@ public partial class PlayerScript : MonoBehaviour
         if ((hitleft.collider == null) && (hitright.collider == null))
         {
             PlayerFST.ChangeState(PlayerTransition.Fail);
-        }else
+        }
+        else
         if (moveH > 0)
         {
             PlayerFST.ChangeState(PlayerTransition.Right);

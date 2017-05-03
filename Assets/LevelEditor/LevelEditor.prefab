@@ -920,11 +920,10 @@ MonoBehaviour:
   mousePosition: {x: 0, y: 0, z: 0}
   MouseX: 0
   MouseY: 0
-  BkgroundPrefab: {fileID: 1376849679624698, guid: 69f9c6750f84aac42ad2a06419ca4e6b,
+  BkgroundPrefab: {fileID: 1300051704902158, guid: 69f9c6750f84aac42ad2a06419ca4e6b,
     type: 2}
   BkgroundImg: {fileID: 0}
-  BkgAnim: {fileID: 0}
-  BkgShow: 1
+  BkgShow: 0
 --- !u!114 &114392793373113412
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -209,12 +209,6 @@ Prefab:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1706994507}
-    - target: {fileID: 114376845633920794, guid: 097a32284b2f61f4f8f9dd3559291abe,
-        type: 2}
-      propertyPath: BkgroundPrefab
-      value: 
-      objectReference: {fileID: 1300051704902158, guid: 69f9c6750f84aac42ad2a06419ca4e6b,
-        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 097a32284b2f61f4f8f9dd3559291abe, type: 2}
   m_IsPrefabParent: 0
