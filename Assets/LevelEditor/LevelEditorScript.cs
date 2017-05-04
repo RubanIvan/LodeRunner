@@ -42,6 +42,8 @@ public class LevelEditorScript : MonoBehaviour
     public GameObject BkgroundImg;
     public bool BkgShow;
 
+    public GameObject PlaerStartPrefab;
+
     void Awake()
     {
        
@@ -90,9 +92,9 @@ public class LevelEditorScript : MonoBehaviour
 
         MouseX = (int)mousePosition.x / 32;
         MouseY = (int)mousePosition.y / -32;
-       
 
-        if (MouseX >= 0 && MouseX <= Const.LevelDx-1 && MouseY >= 0 && MouseY <= Const.LevelDy-1)
+
+        if (MouseX >= 0 && MouseX <= Const.LevelDx - 1 && MouseY >= 0 && MouseY <= Const.LevelDy - 1)
         {
             Cursor.SetCursor(CursorPoint, Vector2.zero, CursorMode.Auto);
             Cursors.SetActive(true);
@@ -116,6 +118,20 @@ public class LevelEditorScript : MonoBehaviour
 
         BkgroundImg.SetActive(BkgShow);
 
+        #region клавиатурные сокращения
+
+        if (Input.GetKeyDown(KeyCode.Alpha1)) ButtonWall();
+        if (Input.GetKeyDown(KeyCode.Alpha2)) ButtonStairs();
+        if (Input.GetKeyDown(KeyCode.Alpha3)) ButtonRope();
+        if (Input.GetKeyDown(KeyCode.Alpha4)) ButtonStone();
+        if (Input.GetKeyDown(KeyCode.Alpha5)) ButtonFalseWall();
+        if (Input.GetKeyDown(KeyCode.Alpha6)) ButtonChest();
+
+        if (Input.GetKeyDown(KeyCode.C)) ButtonClearSpace();
+        if (Input.GetKeyDown(KeyCode.B)) ButtonBkg();
+
+        #endregion
+
     }
 
     public void LevelChange()
@@ -131,7 +147,15 @@ public class LevelEditorScript : MonoBehaviour
     {
         CursorsCurrentBlockType = blockType;
         GameObject.Destroy(CursorsCurrentBlock);
-        CursorsCurrentBlock = Instantiate(GlobalManager.GamePrefab[blockType]);
+        if (blockType == PrefabEnum.Player)
+        {
+            CursorsCurrentBlock = Instantiate(PlaerStartPrefab);
+        }
+        else
+        {
+            CursorsCurrentBlock = Instantiate(GlobalManager.GamePrefab[blockType]);
+        }
+        
         CursorsCurrentBlock.transform.localPosition = new Vector3(0, 0);
         CursorsCurrentBlock.transform.position = Cursors.transform.position;
         CursorsCurrentBlock.transform.parent = Cursors.transform;

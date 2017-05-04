@@ -11,7 +11,7 @@ public enum PlayerTransition
     Ground,
     Landing,
     LandingEnd,
-    
+
 
     Left,
     Right,
@@ -119,7 +119,7 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void Update()
         {
-           CurObject.transform.localPosition=new Vector3(CurObject.transform.localPosition.x, CurObject.transform.localPosition.y-Const.Gravity*Time.deltaTime);
+            CurObject.transform.localPosition = new Vector3(CurObject.transform.localPosition.x, CurObject.transform.localPosition.y - Const.Gravity * Time.deltaTime);
         }
     }
 
@@ -146,6 +146,9 @@ public partial class PlayerScript : MonoBehaviour
 
     public class PS_RunLeft : FsmState
     {
+        private RaycastHit2D hitleft;
+
+
         public PS_RunLeft(GameObject curObj) : base(PlayerState.RunLeft, curObj) { }
 
         public override void StateEnter(Enum prvState)
@@ -155,13 +158,19 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void Update()
         {
-            CurObject.transform.localPosition = new Vector3(CurObject.transform.localPosition.x-Const.PlayerSpeed*Time.deltaTime, CurObject.transform.localPosition.y);
+            //проверка можем ли мы идти в эту сторону
+            hitleft = Physics2D.Raycast(CurObject.transform.position, Vector2.left, 18.0f, Const.WallMask);
+            if (hitleft.collider != null && hitleft.collider.tag == "Wall") return;
+
+            CurObject.transform.localPosition = new Vector3(CurObject.transform.localPosition.x - Const.PlayerSpeed * Time.deltaTime, CurObject.transform.localPosition.y);
         }
     }
 
     public class PS_RunRight : FsmState
     {
         public PS_RunRight(GameObject curObj) : base(PlayerState.RunRight, curObj) { }
+
+        private RaycastHit2D hitright;
 
         public override void StateEnter(Enum prvState)
         {
@@ -170,6 +179,10 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void Update()
         {
+            //проверка можем ли мы идти в эту сторону
+            hitright = Physics2D.Raycast(CurObject.transform.position, Vector2.right, 18.0f, Const.WallMask);
+            if (hitright.collider != null && hitright.collider.tag == "Wall") return;
+
             CurObject.transform.localPosition = new Vector3(CurObject.transform.localPosition.x + Const.PlayerSpeed * Time.deltaTime, CurObject.transform.localPosition.y);
         }
     }

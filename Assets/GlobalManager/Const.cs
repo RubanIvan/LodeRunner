@@ -19,4 +19,7 @@ public static class Const
 
     public const float PlayerSpeed = 150f;
 
+    /// <summary>Маска для непроходимых обьектов</summary>
+    public const int WallMask=1<<8;
+
 }

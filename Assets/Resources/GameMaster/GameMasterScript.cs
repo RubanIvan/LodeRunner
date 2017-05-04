@@ -18,6 +18,8 @@ public class GameMasterScript : MonoBehaviour {
     public GameObject Level;
 
 
+
+
     /// <summary>Создаем уровень</summary>
     void LevelObjInit()
     {
@@ -46,6 +48,7 @@ public class GameMasterScript : MonoBehaviour {
                 {
                     o.transform.parent = gameObject.transform;
                     o.transform.localPosition = new Vector3(x * 32f+16, y * -32f-16);
+                    o.GetComponent<PlayerScript>().GameMaster = this;
                     o.name = "Player";
 
                 }
@@ -63,7 +66,13 @@ public class GameMasterScript : MonoBehaviour {
     void Start () {
         LevelObjInit();
     }
-	
+
+    /// <summary>Вызывается когда игрок взял сундук</summary>
+    public void OnchestCollect()
+    {
+        Debug.Log("ChestCollect");
+    }
+
 	// Update is called once per frame
 	void Update () {
 		

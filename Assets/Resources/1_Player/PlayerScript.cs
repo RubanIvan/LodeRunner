@@ -8,6 +8,9 @@ public partial class PlayerScript : MonoBehaviour
     
     private SpriteRenderer Sprite;
 
+    public GameMasterScript GameMaster;
+
+
     //RayCast ground
     private Vector2 LeftCorner = new Vector2(-7.5f, -16f);
     private Vector2 RightCorner = new Vector2(7.5f, -16f);
@@ -72,8 +75,15 @@ public partial class PlayerScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Destroy(other.gameObject);
-        //Debug.Log("++++++++++++++++  "+other.gameObject);
+
+        Debug.Log(other.tag);
+
+        if (other.tag=="Chest")
+        {
+            GameMaster.OnchestCollect();
+            GameObject.Destroy(other.gameObject);
+
+        }
     }
 
    

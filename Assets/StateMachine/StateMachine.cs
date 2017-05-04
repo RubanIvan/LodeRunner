@@ -54,12 +54,12 @@ public class StateMachine
     /// <summary>Сменить состояние </summary>
     public void ChangeState(Enum transition)
     {
-        Debug.Log("__PrvState:=" + PrvState + "   CurState:=" + CurState + "    TransitionMsg:=" + transition + "\n");
+        //Debug.Log("__PrvState:=" + PrvState + "   CurState:=" + CurState + "    TransitionMsg:=" + transition + "\n");
 
         //если текущее состояние не изменилось то ниче не делаем
         if (CurState == StateTable[Convert.ToInt32(transition), Convert.ToInt32(CurState)].CurState) return;
 
-        Debug.Log("PrvState:=" + PrvState + "   CurState:="+CurState + "    TransitionMsg:=" + transition + "   NewState:=" + StateTable[Convert.ToInt32(transition), Convert.ToInt32(CurState)].CurState+"\n");
+        //Debug.Log("PrvState:=" + PrvState + "   CurState:="+CurState + "    TransitionMsg:=" + transition + "   NewState:=" + StateTable[Convert.ToInt32(transition), Convert.ToInt32(CurState)].CurState+"\n");
 
         //выполнить выход из текущего состояния
         State.StateExit(transition);
