@@ -10,18 +10,24 @@ public partial class PlayerScript : MonoBehaviour
 
     public GameMasterScript GameMaster;
 
-    ////RayCast ground
+    /// <summary>индикатор висим мы на веревке или нет</summary>
+    public bool OnRope;
+
+
+    //RayCast ground
     private Vector2 LeftCorner = new Vector2(-7.5f, -16f);
     private Vector2 RightCorner = new Vector2(7.5f, -16f);
     private RaycastHit2D hitleft;
     private RaycastHit2D hitright;
 
-    private float moveH;
-    private float moveV;
-
-    ///// <summary>Конечный автомат состояний </summary>
+    /// <summary>Конечный автомат состояний </summary>
     public StateMachine PlayerFST;
-    public PsmState[,] PlayerStateTable = new PsmState[Enum.GetNames(typeof(PlayerTransition)).Length, Enum.GetNames(typeof(PlayerState)).Length];
+    public FsmState[,] PlayerStateTable = new FsmState[Enum.GetNames(typeof(PlayerTransition)).Length, Enum.GetNames(typeof(PlayerState)).Length];
+
+    /// <summary>движение в горизонтальной плоскости </summary>
+    public float moveH;
+
+    public Action<Collider2D> OnTriggerExit;
 
     void Awake()
     {
@@ -30,14 +36,28 @@ public partial class PlayerScript : MonoBehaviour
         Sprite = GetComponent<SpriteRenderer>();
     }
 
-   
-    //// Update is called once per frame
-    void Update()
+    // Use this for initialization
+    void Start()
     {
 
-        moveH = Input.GetAxis("Horizontal");
-        moveV = Input.GetAxis("Vertical");
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
+        //Debug.DrawRay(transform.position, LeftCorner * 1.1f, Color.green);
+        //Debug.DrawRay(transform.position, RightCorner * 1.1f, Color.green);
+
+        hitleft = Physics2D.Raycast(transform.position, LeftCorner, 18.6f, Const.WallMask | Const.StairsMask);
+        hitright = Physics2D.Raycast(transform.position, RightCorner, 18.6f, Const.WallMask | Const.StairsMask);
+
+        moveH = Input.GetAxis("Horizontal");
+
+        if ((hitleft.collider == null) && (hitright.collider == null) && OnRope==false)
+        {
+            PlayerFST.ChangeState(PlayerTransition.Fall);
+        }
+        else
         if (moveH > 0)
         {
             PlayerFST.ChangeState(PlayerTransition.Right);
@@ -47,14 +67,7 @@ public partial class PlayerScript : MonoBehaviour
         {
             PlayerFST.ChangeState(PlayerTransition.Left);
             Sprite.flipX = false;
-        }
-        else if (moveV > 0)
-        {
-            PlayerFST.ChangeState(PlayerTransition.Up);
-        }
-        else if (moveV < 0)
-        {
-            PlayerFST.ChangeState(PlayerTransition.Down);
+
         }
         else
         {
@@ -69,36 +82,23 @@ public partial class PlayerScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        PlayerFST.State.OnTriggerEnter2D(other);
+
+        //Debug.Log(other.tag);
 
         if (other.tag == "Chest")
         {
             GameMaster.OnchestCollect();
             GameObject.Destroy(other.gameObject);
+
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        PlayerFST.State.OnTriggerExit2D(other);
+        if (OnTriggerExit != null) OnTriggerExit(other);
     }
 
-    void OnTriggerStay2D(Collider2D other)
-    {
-        PlayerFST.State.OnTriggerStay2D(other);
-    }
-    
-
-    public void GroundCheck()
-    {
-        hitleft = Physics2D.Raycast(transform.position, LeftCorner, 18.6f, Const.WallMask | Const.StairsMask);
-        hitright = Physics2D.Raycast(transform.position, RightCorner, 18.6f, Const.WallMask | Const.StairsMask);
 
 
-        if ((hitleft.collider == null) && (hitright.collider == null))
-        {
-            PlayerFST.ChangeState(PlayerTransition.Fall);
-        }
-    }
 
 }
