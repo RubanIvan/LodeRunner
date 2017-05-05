@@ -5,10 +5,13 @@ using UnityEngine;
 
 public partial class PlayerScript : MonoBehaviour
 {
-    
+
     private SpriteRenderer Sprite;
 
     public GameMasterScript GameMaster;
+
+    /// <summary>индикатор висим мы на веревке или нет</summary>
+    public bool OnRope;
 
 
     //RayCast ground
@@ -24,31 +27,35 @@ public partial class PlayerScript : MonoBehaviour
     /// <summary>движение в горизонтальной плоскости </summary>
     public float moveH;
 
+    public Action<Collider2D> OnTriggerExit;
+
     void Awake()
     {
         SatetItit();
-        PlayerFST = new StateMachine(PlayerStateTable, PlayerState.Idle);
+        PlayerFST = new StateMachine(PlayerStateTable, PlayerState.Stand);
         Sprite = GetComponent<SpriteRenderer>();
     }
 
     // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         //Debug.DrawRay(transform.position, LeftCorner * 1.1f, Color.green);
         //Debug.DrawRay(transform.position, RightCorner * 1.1f, Color.green);
 
-        hitleft = Physics2D.Raycast(transform.position, LeftCorner, 18.6f);
-        hitright = Physics2D.Raycast(transform.position, RightCorner, 18.6f);
+        hitleft = Physics2D.Raycast(transform.position, LeftCorner, 18.6f, Const.WallMask | Const.StairsMask);
+        hitright = Physics2D.Raycast(transform.position, RightCorner, 18.6f, Const.WallMask | Const.StairsMask);
 
         moveH = Input.GetAxis("Horizontal");
 
-        if ((hitleft.collider == null) && (hitright.collider == null))
+        if ((hitleft.collider == null) && (hitright.collider == null) && OnRope==false)
         {
-            PlayerFST.ChangeState(PlayerTransition.Fail);
+            PlayerFST.ChangeState(PlayerTransition.Fall);
         }
         else
         if (moveH > 0)
@@ -76,9 +83,9 @@ public partial class PlayerScript : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
 
-        Debug.Log(other.tag);
+        //Debug.Log(other.tag);
 
-        if (other.tag=="Chest")
+        if (other.tag == "Chest")
         {
             GameMaster.OnchestCollect();
             GameObject.Destroy(other.gameObject);
@@ -86,6 +93,12 @@ public partial class PlayerScript : MonoBehaviour
         }
     }
 
-   
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (OnTriggerExit != null) OnTriggerExit(other);
+    }
+
+
+
 
 }

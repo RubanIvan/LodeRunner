@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4618748171603758}
   - component: {fileID: 212073188850295744}
   - component: {fileID: 61220399642798998}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Rope
   m_TagString: Rope
   m_Icon: {fileID: 0}
