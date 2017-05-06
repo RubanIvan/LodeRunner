@@ -13,12 +13,16 @@ public enum PlayerTransition
     Down,
     //Fire,
 
-
+    /// <summary>падение </summary>
     Fall,
+    /// <summary>у персонажа появился пол под ногами </summary>
     Ground,
+    /// <summary>начало приседания после прышка</summary>
     LandingEnd,
-
+    /// <summary>ухватился за веревку</summary>
     RopeTake,
+    /// <summary>веревка закончилась</summary>
+    RopeEnd,
 
     //FireLeft,
     //FireRight,
@@ -47,11 +51,11 @@ public enum PlayerState
     RopeIdle,
     RopeLeft,
     RopeRight,
-    
+
     //StairsIdle,
     //StairsUp,
     //StairsDown,
-    
+
 }
 
 
@@ -87,6 +91,7 @@ public partial class PlayerScript : MonoBehaviour
         PlayerStateTable[(int)PlayerTransition.Up, (int)PlayerState.Falling] = falling;
         PlayerStateTable[(int)PlayerTransition.Ground, (int)PlayerState.Falling] = landing;
         PlayerStateTable[(int)PlayerTransition.RopeTake, (int)PlayerState.Falling] = ropeIdle;
+        PlayerStateTable[(int)PlayerTransition.LandingEnd, (int)PlayerState.Falling] = stand;
 
 
         PlayerStateTable[(int)PlayerTransition.Idle, (int)PlayerState.Landing] = landing;
@@ -105,7 +110,7 @@ public partial class PlayerScript : MonoBehaviour
         PlayerStateTable[(int)PlayerTransition.Fall, (int)PlayerState.RunRight] = falling;
         PlayerStateTable[(int)PlayerTransition.Left, (int)PlayerState.RunRight] = runLeft;
         PlayerStateTable[(int)PlayerTransition.Right, (int)PlayerState.RunRight] = runRight;
-        
+
 
         PlayerStateTable[(int)PlayerTransition.Idle, (int)PlayerState.RopeIdle] = ropeIdle;
         //PlayerStateTable[(int)PlayerTransition.Fall, (int)PlayerState.RopeIdle] = ropeIdle;
@@ -117,12 +122,13 @@ public partial class PlayerScript : MonoBehaviour
         PlayerStateTable[(int)PlayerTransition.Left, (int)PlayerState.RopeLeft] = ropeLeft;
         PlayerStateTable[(int)PlayerTransition.Right, (int)PlayerState.RopeLeft] = ropeRight;
         PlayerStateTable[(int)PlayerTransition.Down, (int)PlayerState.RopeLeft] = falling;
+        PlayerStateTable[(int)PlayerTransition.RopeEnd, (int)PlayerState.RopeLeft] = stand;
 
         PlayerStateTable[(int)PlayerTransition.Idle, (int)PlayerState.RopeRight] = ropeIdle;
         PlayerStateTable[(int)PlayerTransition.Left, (int)PlayerState.RopeRight] = ropeLeft;
         PlayerStateTable[(int)PlayerTransition.Right, (int)PlayerState.RopeRight] = ropeRight;
         PlayerStateTable[(int)PlayerTransition.Down, (int)PlayerState.RopeRight] = falling;
-
+        PlayerStateTable[(int)PlayerTransition.RopeEnd, (int)PlayerState.RopeRight] = stand;
 
 
 
@@ -147,10 +153,7 @@ public partial class PlayerScript : MonoBehaviour
 
     public class PS_Falling : PsmState
     {
-        public PS_Falling(GameObject curObj) : base(PlayerState.Falling, curObj){}
-
-        private RaycastHit2D hitleft;
-        private RaycastHit2D hitright;
+        public PS_Falling(GameObject curObj) : base(PlayerState.Falling, curObj) { }
 
         private Vector2 LeftCorner = new Vector2(-7.5f, -16f);
         private Vector2 RightCorner = new Vector2(7.5f, -16f);
@@ -163,25 +166,25 @@ public partial class PlayerScript : MonoBehaviour
         public override void Update()
         {
 
-            hitleft = Physics2D.Raycast(player.gameObject.transform.position, LeftCorner, 18.6f, Const.WallMask | Const.StairsMask);
-            hitright = Physics2D.Raycast(player.gameObject.transform.position, RightCorner, 18.6f, Const.WallMask | Const.StairsMask);
+            hitLeft = Physics2D.Raycast(player.gameObject.transform.position, LeftCorner, 18.6f, Const.WallMask | Const.StairsMask);
+            hitRight = Physics2D.Raycast(player.gameObject.transform.position, RightCorner, 18.6f, Const.WallMask | Const.StairsMask);
 
 
-            if ((hitleft.collider != null) || (hitright.collider != null))
+            if ((hitLeft.collider != null) || (hitRight.collider != null))
             {
                 player.PlayerFST.ChangeState(PlayerTransition.Ground);
 
-                if(hitleft.collider != null) player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x,hitleft.collider.gameObject.transform.localPosition.y+16f);
-                if (hitright.collider != null) player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x, hitright.collider.gameObject.transform.localPosition.y+16f );
+                if (hitLeft.collider != null) player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x, hitLeft.collider.gameObject.transform.localPosition.y + 16f);
+                if (hitRight.collider != null) player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x, hitRight.collider.gameObject.transform.localPosition.y + 16f);
                 return;
             }
 
             player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x, player.gameObject.transform.localPosition.y - Const.Gravity * Time.deltaTime);
         }
 
-        public override void  OnTriggerExit2D(Collider2D other)
+        public override void OnTriggerExit2D(Collider2D other)
         {
-            Debug.Log("RopeTake");
+            //Debug.Log("RopeTake");
             if (other.tag == "Rope") player.PlayerFST.ChangeState(PlayerTransition.RopeTake);
         }
     }
@@ -192,6 +195,8 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void StateEnter(Enum prvState)
         {
+
+            //player.PlayerFST.ChangeState(PlayerTransition.LandingEnd);
             Animator.Play("LandingHiAnimation");
         }
     }
@@ -202,56 +207,11 @@ public partial class PlayerScript : MonoBehaviour
         PlayerFST.ChangeState(PlayerTransition.LandingEnd);
     }
 
-    public class PS_RunLeft : PsmState
-    {
-        private RaycastHit2D hitleft;
-
-
-        public PS_RunLeft(GameObject curObj) : base(PlayerState.RunLeft, curObj) { }
-
-        public override void StateEnter(Enum prvState)
-        {
-            Animator.Play("RunAnimation");
-        }
-
-        public override void Update()
-        {
-            //проверка можем ли мы идти в эту сторону
-            hitleft = Physics2D.Raycast(player.gameObject.transform.position, Vector2.left, 18.0f, Const.WallMask);
-            if (hitleft.collider != null) return;
-
-            player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x - Const.PlayerRunSpeed * Time.deltaTime, player.gameObject.transform.localPosition.y);
-
-            player.GroundCheck();
-        }
-    }
-
-    public class PS_RunRight : PsmState
-    {
-        public PS_RunRight(GameObject curObj) : base(PlayerState.RunRight, curObj) { }
-
-        private RaycastHit2D hitright;
-
-        public override void StateEnter(Enum prvState)
-        {
-            Animator.Play("RunAnimation");
-        }
-
-        public override void Update()
-        {
-            //проверка можем ли мы идти в эту сторону
-            hitright = Physics2D.Raycast(player.gameObject.transform.position, Vector2.right, 18.0f, Const.WallMask);
-            if (hitright.collider != null) return;
-
-            player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x + Const.PlayerRunSpeed * Time.deltaTime, player.gameObject.transform.localPosition.y);
-
-            player.GroundCheck();
-        }
-    }
+    
 
     public class PS_RopeIdle : PsmState
     {
-        public PS_RopeIdle(GameObject curObj) : base(PlayerState.RopeIdle, curObj){}
+        public PS_RopeIdle(GameObject curObj) : base(PlayerState.RopeIdle, curObj) { }
 
         public override void StateEnter(Enum prvState)
         {
@@ -261,8 +221,6 @@ public partial class PlayerScript : MonoBehaviour
 
     public class PS_RopeLeft : PsmState
     {
-        private RaycastHit2D hitleft;
-
 
         public PS_RopeLeft(GameObject curObj) : base(PlayerState.RopeLeft, curObj) { }
 
@@ -283,9 +241,6 @@ public partial class PlayerScript : MonoBehaviour
 
     public class PS_RopeRight : PsmState
     {
-        private RaycastHit2D hitleft;
-
-
         public PS_RopeRight(GameObject curObj) : base(PlayerState.RopeRight, curObj) { }
 
         public override void StateEnter(Enum prvState)
@@ -295,9 +250,41 @@ public partial class PlayerScript : MonoBehaviour
 
         public override void Update()
         {
-            ////проверка можем ли мы идти в эту сторону
-            //hitleft = Physics2D.Raycast(CurObject.transform.position, Vector2.left, 18.0f, Const.WallMask);
-            //if (hitleft.collider != null && hitleft.collider.tag == "Wall") return;
+            //проверка можем ли мы идти в эту сторону
+
+            hitRight = Physics2D.Raycast(player.gameObject.transform.position, Vector2.right, 18.0f, Const.WallMask);
+            //если слева стена то дальше идти не можем
+            if (hitRight.collider != null) return;
+
+
+            hitUp = Physics2D.Raycast(player.gameObject.transform.position, Vector2.up, 18.0f, Const.RopeMask);
+            //если мы на половину высунулись из веревки
+            if (hitUp.collider == null)
+            {
+                hitRight = Physics2D.Raycast(player.gameObject.transform.position, Vector2.right, 18.0f);
+                //сходим с веревки на пол или пустату
+                if (hitRight.collider == null)
+                {
+                    player.PlayerFST.ChangeState(PlayerTransition.RopeEnd);
+                    //корекция высоты
+                    int y = ((int)(player.gameObject.transform.localPosition.y / 32) * 32)-16;
+                    player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x + Const.PlayerRopeSpeed * Time.deltaTime, y - 0.5f);
+                    //Debug.Log("RopeEnd  "+y);
+                    return;
+                }
+
+                hitRight = Physics2D.Raycast(player.gameObject.transform.position, Vector2.right, 18.0f,Const.StairsMask);
+                //сходим с веревки на лестницу
+                if (hitRight.collider != null)
+                {
+                    player.PlayerFST.ChangeState(PlayerTransition.RopeEnd);
+                    int y = ((int)(player.gameObject.transform.localPosition.y / 32) * 32)-16;
+                    player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x + Const.PlayerRopeSpeed * Time.deltaTime, y - 0.5f);
+                    //Debug.Log("RopeEnd  "+y);
+                    //player.PlayerFST.ChangeState(PlayerTransition.LandingEnd);
+                    return;
+                }
+            }
 
             player.gameObject.transform.localPosition = new Vector3(player.gameObject.transform.localPosition.x + Const.PlayerRopeSpeed * Time.deltaTime, player.gameObject.transform.localPosition.y);
         }

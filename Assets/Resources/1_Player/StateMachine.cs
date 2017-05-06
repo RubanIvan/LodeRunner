@@ -10,6 +10,14 @@ public abstract class PsmState
     protected PlayerScript player;
     protected Animator Animator;
 
+    protected RaycastHit2D hit;
+    protected RaycastHit2D hitLeft;
+    protected RaycastHit2D hitRight;
+    protected RaycastHit2D hitUp;
+
+    //для корекции высоты
+    protected int y;
+
     /// <summary>Текущее состояние</summary>
     public PlayerState CurState { get; private set; }
 
@@ -63,7 +71,7 @@ public class StateMachine
         //если текущее состояние не изменилось то ниче не делаем
         if (CurState == StateTable[(int)transition, (int)CurState].CurState) return;
 
-        Debug.Log("PrvState:=" + PrvState + "   CurState:=" + CurState + "    TransitionMsg:=" + transition + "   NewState:=" + StateTable[Convert.ToInt32(transition), Convert.ToInt32(CurState)].CurState + "\n");
+        Debug.Log("   CurState:=" + CurState + "    TransitionMsg:=" + transition + "   NewState:=" + StateTable[Convert.ToInt32(transition), Convert.ToInt32(CurState)].CurState + "\n");
 
         //выполнить выход из текущего состояния
         State.StateExit(transition);
